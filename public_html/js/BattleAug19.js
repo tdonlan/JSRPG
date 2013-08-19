@@ -6,8 +6,8 @@
 
 var battleState = 0;
 
-var playerJSON = {"name": "Player", "TotalHP": 100, "CurrentHP": 100, "AttackScore": 150, "DefenseScore": 5, "WeaponDmg": 10};
-var enemyJSON = {"name": "Goblin", "TotalHP": 50, "CurrentHP": 50, "AttackScore": 10, "DefenseScore": 100, "WeaponDmg": 5};
+var playerJSON = {"name": "Player", "TotalHP": 100, "CurrentHP": 100, "AttackScore": 50, "DefenseScore": 50, "WeaponDmg": 10};
+var enemyJSON = {"name": "Goblin", "TotalHP": 50, "CurrentHP": 50, "AttackScore": 10, "DefenseScore": 10, "WeaponDmg": 5};
 
 var player;
 var enemy;
@@ -30,7 +30,7 @@ function initBattle(battleID, logID)
 
     //set up the loop timer
     battleTimer = setInterval(function() {
-        BattleLoop()
+        BattleLoop();
     }, 1000);
 
 
@@ -78,21 +78,33 @@ function BattleLoop()
 
 }
 
+function playerHeal()
+{
+    player.CurrentHP += 10;
+    if(player.CurrentHP > player.TotalHP)
+        {
+            player.CurrentHP = player.TotalHP;
+        }
+    combatStatus += player.name + " healed for 10. <br>";
+    battleState = 2;
+}
+
 function playerAttack()
 {
     var attackRatio = 100 - (player.AttackScore / enemy.DefenseScore * 50);
     attackRatio = fixAttackRatio(attackRatio);
-    if ((Math.random() * 100) > attackRatio)
+    var roll = Math.random() * 100;
+    if (roll > attackRatio)
     {
         var dmgScale = fixDmgScale(player.AttackScore / enemy.DefenseScore);
-        var dmg = player.WeaponDmg * dmgScale;
-        combatStatus += player.name + " hit " + enemy.name + " for " + dmg + " damage" + "<br>";
+        var dmg = Math.round(player.WeaponDmg * dmgScale);
+        combatStatus += player.name + " hit (" + roll + ") " + enemy.name + " for " + dmg + " damage" + "<br>";
         enemy.CurrentHP = enemy.CurrentHP - dmg;
 
     }
     else
     {
-        combatStatus += player.name + " missed " + enemy.name + "<br>";
+        combatStatus += player.name + " missed (" + roll + ")" + enemy.name + "<br>";
     }
 
     if (enemy.CurrentHP <= 0)
@@ -111,17 +123,18 @@ function enemyAttack()
 {
     var attackRatio = 100 - (enemy.AttackScore / player.DefenseScore * 50);
     attackRatio = fixAttackRatio(attackRatio);
-    if ((Math.random() * 100) > attackRatio)
+    var roll = Math.random() * 100;
+    if (roll > attackRatio)
     {
         var dmgScale = fixDmgScale(enemy.AttackScore / player.DefenseScore);
-        var dmg = enemy.WeaponDmg * dmgScale;
-        combatStatus += enemy.name + " hit " + player.name + " for " + dmg + " damage" + "<br>";
+        var dmg = Math.round(enemy.WeaponDmg * dmgScale);
+        combatStatus += enemy.name + " hit (" + roll + ") " + player.name + " for " + dmg + " damage" + "<br>";
         player.CurrentHP = player.CurrentHP - dmg;
 
     }
     else
     {
-        combatStatus += enemy.name + " missed " + player.name + "<br>";
+        combatStatus += enemy.name + " missed (" + roll + ") " + player.name + "<br>";
     }
 
     if (player.CurrentHP <= 0)
@@ -150,13 +163,13 @@ function LoseBattle()
 
 function fixAttackRatio(atkRatio)
 {
-    if (atkRatio > 90)
+    if (atkRatio > 75)
     {
-        atkRatio = 90;
+        atkRatio = 75;
     }
-    if (atkRatio < 10)
+    if (atkRatio < 25)
     {
-        atkRatio = 10;
+        atkRatio = 25;
     }
 
     return atkRatio;
@@ -168,12 +181,21 @@ function fixDmgScale(dmgScale)
     if (dmgScale > 2)
     {
         dmgScale = 2;
+
     }
-    if (dmgScale < .1)
+    if (dmgScale < .2)
     {
-        dmgScale = .1;
+        dmgScale = .2;
+
     }
-    return dmgScale;
+    if (dmgScale > 1)
+    {
+        return 1 + (Math.random() * dmgScale);
+    }
+    else
+    {
+        return .2 + (Math.random() * dmgScale);
+    }
 }
 
 //print the stats of the player and enemy, along with button
@@ -193,10 +215,12 @@ function printBattle()
     if (battleState === 1)
     {
         htmlStr += "<br><input type='button' onclick='playerAttack();'>Attack!</input>";
+         htmlStr += "<br><input type='button' onclick='playerHeal();'>Heal!</input>";
     }
     else
     {
         htmlStr += "<br><input type='button' onclick='playerAttack();' disabled>Attack!</input>";
+         htmlStr += "<br><input type='button' onclick='playerAttack();' disabled>Heal!</input>";
     }
 
     return htmlStr;
