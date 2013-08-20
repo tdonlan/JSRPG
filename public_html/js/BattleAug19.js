@@ -2,10 +2,10 @@
 var battleState = 0;
 
 var playerJSON = {"name": "Player", "TotalHP": 100, "CurrentHP": 100, "AttackScore": 50, "DefenseScore": 50, "WeaponDmg": 10};
-var enemyJSON = {"name": "Goblin", "TotalHP": 50, "CurrentHP": 50, "AttackScore": 10, "DefenseScore": 10, "WeaponDmg": 5};
+var enemyJSON = {"name": "Goblin", "TotalHP": 50, "CurrentHP": 50, "AttackScore": 75, "DefenseScore": 55, "WeaponDmg": 20};
 
 var playerItemJSON = {"Items": [{"name": "Healing Potion", "type": "Heal", "amount": 10},{"name": "Healing Potion", "type": "Heal", "amount": 10}]};
-var playerAbilitiesJSON = {"Abilities": [{"name": "Super Attack", "type":"damage", "cooldown": 2, "amount": 25}]};
+var playerAbilitiesJSON = {"Abilities": [{"name": "Super Attack", "type":"damage", "timer":0, "cooldown": 2, "amount": 25}]};
 
 var enemyItemJSON = {"Items": [{"name": "Healing Potion"}, {"name": "Rusty Dagger"}, {"name": "Copper Key"}]};
 
@@ -66,6 +66,7 @@ function BattleLoop()
             //do nothing, wait for player input
             break;
         case 2:
+            UpdateAbilityTick(); //best spot for this?
             enemyAttack();
             break;
         case 3:
@@ -301,6 +302,8 @@ function UseAbility(abName)
     {
         playerDamageEnemy(usedAbility.amount);
     }
+    
+    usedAbility.timer = usedAbility.cooldown;
 
     //remove used item
     //var index = playerAbilities.Abilities.indexOf(usedItem);
@@ -309,15 +312,35 @@ function UseAbility(abName)
     
 }
 
+//go through and update the counters on abilities
+function UpdateAbilityTick()
+{
+    for(var ab in playerAbilities.Abilities)
+        {
+            var curAbility = playerAbilities.Abilities[ab];
+            curAbility.timer = curAbility.timer - 1;
+            if(curAbility.timer < 0)
+                {
+                    curAbility.timer = 0;
+                }
+        }
+}
+
 function DisplayAbilities()
 {
      var retval = "";
     for (var ab in playerAbilities.Abilities)
     {
         var functionCall = "UseAbility('" + playerAbilities.Abilities[ab].name + "');";
-       
-        retval += "<br><input type='button' onclick=\""+functionCall+"\" >" + playerAbilities.Abilities[ab].name + "</input>";
-          
+       if(playerAbilities.Abilities[ab].timer === 0)
+           {
+                retval += "<br><input type='button' onclick=\""+functionCall+"\" >" + playerAbilities.Abilities[ab].name + "</input>";
+           }
+           else
+               {
+               retval += "<br><input type='button' onclick=\""+functionCall+"\" disabled>" + playerAbilities.Abilities[ab].name 
+                       + "(" + playerAbilities.Abilities[ab].timer + ")" + "</input>";
+               }
     }
 
     return retval;
