@@ -1,6 +1,14 @@
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
-
+function getItemsFromCSV(name)
+{
+    var rawCSV = 
+   $.ajax(
+  {
+    type: 'GET',
+    async: false,
+    url:  name
+  }).responseText;
+  
+  return $.csv.toObjects(rawCSV);  
+  
+}

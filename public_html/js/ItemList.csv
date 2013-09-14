@@ -1,0 +1,13 @@
+id,name,description,type,effect,amount,cost
+1,small healing potion,heals 10 hit points,potion,heal,10,10
+2,large healing potion,heals 100 hit points,potion,heal,100,75
+3,rusty dagger,very rusty,weapon,damage,5,10
+4,bent sword,it has a dull edge,weapon,damage,15,25
+5,wood axe,sturdy but well used,weapon,damage,25,50
+6,long sword,has a keen edge,weapon,damage,50,100
+7,greatsword of forged badassery,covered in glowing runes and ornate jewelwork,weapon,damage,200,1000
+8,firecracker,short fuse and a big bang,item,damage,50,10
+9,holy hand grenade,counteth to three,item,damage,200,200
+10,leather jerkin,from the hide of an aurocks,equipment,defense,50,100
+11,fine platemail,ornately hewn,equipment,defense,200,1000
+12,violent amulet,a red skull glows in the center,equipment,attack,50,500
