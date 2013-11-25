@@ -175,16 +175,9 @@ function getAttackRatio(attackerValue, defenderValue)
     
     
     
-    var attackRatio = ((attackerValue - defenderValue) / (attackerValue + defenderValue)) + 0.5;
-    if (attackRatio <= 0)
-    {
-        attackRatio = 0.01;
-    }
-    if (attackRatio >= 1)
-    {
-        attackRatio = 0.99;
-    }
-
+    var attackRatio = (attackerValue - defenderValue) / (attackerValue + defenderValue);
+    attackRatio = (attackRatio + 1) / 2;
+    
     return attackRatio * 100;
 
 }
