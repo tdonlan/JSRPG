@@ -3,22 +3,22 @@ var battleState = 0;
 
 var playerJSON = {"name": "Player", "TotalHP": 100, "CurrentHP": 100, "AttackScore": 10, "DefenseScore": 10};
 //var playerItemJSON = {"Items": [{"name": "Healing Potion", "type": "heal", "amount": 100}, {"name": "Healing Potion", "type": "heal", "amount": 100}, {"name": "Grenade", "type": "damage", "amount": 50}]};
-var playerAbilitiesJSON = {"Abilities": [{"name": "Super Attack", "type": "damage", "timer": 0, "cooldown": 2, "amount": 25}]};
+var playerAbilitiesJSON = [{"name": "Super Attack", "type": "damage", "timer": 0, "cooldown": 2, "amount": 25}];
 //var playerWeaponJSON = {"Weapons": [{"name": "Bent Dagger", "damage": 10, "equipped": true}]};
 
-var goblinJSON = {"name": "Goblin", "TotalHP": 50, "CurrentHP": 50, "AttackScore": 10, "DefenseScore": 10, "WeaponDmg": 5, "coin":10, "ItemList":"goblinItemList"};
-var dragonJSON = {"name": "Dragon", "TotalHP": 200, "CurrentHP": 200, "AttackScore": 75, "DefenseScore": 55, "WeaponDmg": 50, "coin":500, "ItemList":"dragonItemList"};
+var goblinJSON = {"name": "Goblin", "TotalHP": 50, "CurrentHP": 50, "AttackScore": 10, "DefenseScore": 10, "WeaponDmg": 5, "coin": 10, "ItemList": "goblinItemList"};
+var dragonJSON = {"name": "Dragon", "TotalHP": 200, "CurrentHP": 200, "AttackScore": 75, "DefenseScore": 55, "WeaponDmg": 50, "coin": 500, "ItemList": "dragonItemList"};
 var enemyList = ["goblinJSON", "dragonJSON"];
 
 
 //-------  Item Lists ----------
 
-var store1ItemList = [1,2,3,4,5,6,7,8,9,10,11,12];
+var store1ItemList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-var playerItemList = [1,1,3];
+var playerItemList = [1, 1, 3];
 
-var goblinItemList = [1,1,4];
-var dragonItemList = [2,2,2,2,7,9,12];
+var goblinItemList = [1, 1, 4];
+var dragonItemList = [2, 2, 2, 2, 7, 9, 12];
 
 var player;
 var playerEquipment = [];
@@ -45,8 +45,8 @@ function initGame(battleID, logID)
     this.battleID = battleID;
     this.logID = logID;
 
-   resetGame();
-    
+    resetGame();
+
 }
 
 function resetGame()
@@ -54,15 +54,15 @@ function resetGame()
     combatStatus = "";
     var battleElement = document.getElementById(logID);
     battleElement.innerHTML = combatStatus;
-    
-     masterItemList = loadItemsFromCSV('js/ItemList.csv');
+
+    masterItemList = loadItemsFromCSV('js/ItemList.csv');
     player = JSON.parse(JSON.stringify(playerJSON));
     playerItems = GetItemListFromIDList(playerItemList);
-    playerAbilities = JSON.parse(JSON.stringify(playerAbilitiesJSON)); 
+    playerAbilities = JSON.parse(JSON.stringify(playerAbilitiesJSON));
     playerMoney = 1000;
-    
+
     DisplayGameWorld();
-    
+
 }
 
 function initBattleWithEnemy(enemy)
@@ -73,9 +73,9 @@ function initBattleWithEnemy(enemy)
 
 function initBattle(enemyJSON)
 {
-     enemy = JSON.parse(JSON.stringify(enemyJSON)); 
-     enemyItems = GetItemListFromIDList(this[enemy.ItemList]);
-    
+    enemy = JSON.parse(JSON.stringify(enemyJSON));
+    enemyItems = GetItemListFromIDList(this[enemy.ItemList]);
+
     combatStatus = "";
 
     battleState = 0;
@@ -172,6 +172,9 @@ function playerDamageEnemy(amount)
 //returns the percent that the attack will hit
 function getAttackRatio(attackerValue, defenderValue)
 {
+    
+    
+    
     var attackRatio = ((attackerValue - defenderValue) / (attackerValue + defenderValue)) + 0.5;
     if (attackRatio <= 0)
     {
@@ -243,25 +246,22 @@ function enemyAttack()
 function WinBattle()
 {
     combatStatus += player.name + " defeated " + enemy.name + "<br>";
-    combatStatus += "Gold collected: " + enemy.coin;
-    playerMoney += parseInt(enemy.coin,10);
-    combatStatus += "Loot collected: " + PrintItemList(enemyItems);
+    combatStatus += "<br>Gold collected: " + enemy.coin;
+    playerMoney += parseInt(enemy.coin, 10);
+    combatStatus += "<br>Loot collected: " + PrintItemList(enemyItems);
     AddPlayerItemsFromList(enemyItems);
     battleState = 3;
-
-
 }
 
 function LoseBattle()
 {
     combatStatus += player.name + " was defeated by " + enemy.name + "<br>";
     combatStatus += "You died! - Game Over";
-    
-     battleState = 4;
-   
-     combatStatus += "<br><a href='javascript:void(0)' onclick='resetGame();'>Restart Game</a>";
-  
-   
+
+    battleState = 4;
+
+    combatStatus += "<br><a href='javascript:void(0)' onclick='resetGame();'>Restart Game</a>";
+
 }
 
 function fixAttackRatio(atkRatio)
@@ -304,45 +304,45 @@ function fixDmgScale(dmgScale)
 function getPlayerAttack()
 {
     var bonusAttack = 0;
-    for(var item in playerEquipment)
+    for (var item in playerEquipment)
+    {
+        if (playerEquipment[item].effect === "attack")
         {
-            if(playerEquipment[item].effect === "attack")
-                {
-                 bonusAttack += parseInt(playerEquipment[item].amount,10);   
-                }
+            bonusAttack += parseInt(playerEquipment[item].amount, 10);
         }
-    
+    }
+
     return player.AttackScore + bonusAttack;
 }
 
 function getPlayerDefense()
 {
-     var bonusDefense = 0;
-    for(var item in playerEquipment)
+    var bonusDefense = 0;
+    for (var item in playerEquipment)
+    {
+        if (playerEquipment[item].effect === "defense")
         {
-            if(playerEquipment[item].effect === "defense")
-                {
-                 bonusDefense += parseInt(playerEquipment[item].amount,10);   
-                }
+            bonusDefense += parseInt(playerEquipment[item].amount, 10);
         }
-    
+    }
+
     return player.DefenseScore + bonusDefense;
-    
+
 }
 
 function getPlayerDamage()
 {
     var wepDamage = 1;
-    
-    for(var item in playerEquipment)
+
+    for (var item in playerEquipment)
+    {
+        if (playerEquipment[item].type === "equip_weapon")
         {
-            if(playerEquipment[item].type === "equip_weapon")
-                {
-                 wepDamage = parseInt(playerEquipment[item].amount,10);   
-                }
+            wepDamage = parseInt(playerEquipment[item].amount, 10);
         }
-        
-        return wepDamage;
+    }
+
+    return wepDamage;
 }
 
 
@@ -421,11 +421,11 @@ function UseAbility(abName)
     //get the item from the item list
     var usedAbility;
 
-    for (var ab in playerAbilities.Abilities)
+    for (var ab in playerAbilities)
     {
-        if (playerAbilities.Abilities[ab].name === abName)
+        if (playerAbilities[ab].name === abName)
         {
-            usedAbility = playerAbilities.Abilities[ab];
+            usedAbility = playerAbilities[ab];
         }
     }
 
@@ -448,9 +448,9 @@ function UseAbility(abName)
 //go through and update the counters on abilities
 function UpdateAbilityTick()
 {
-    for (var ab in playerAbilities.Abilities)
+    for (var ab in playerAbilities)
     {
-        var curAbility = playerAbilities.Abilities[ab];
+        var curAbility = playerAbilities[ab];
         curAbility.timer = curAbility.timer - 1;
         if (curAbility.timer < 0)
         {
@@ -462,18 +462,23 @@ function UpdateAbilityTick()
 function DisplayAbilities()
 {
     var retval = "";
-    for (var ab in playerAbilities.Abilities)
+    for (var ab in playerAbilities)
     {
-        var functionCall = "UseAbility('" + playerAbilities.Abilities[ab].name + "');";
- 
-        if (playerAbilities.Abilities[ab].timer === 0)
+        var functionCall = "UseAbility('" + playerAbilities[ab].name + "');";
+        var displayName = playerAbilities[ab].name;
+
+        if (playerAbilities[ab].timer != 0)
         {
-            retval += "<br><input type='button' onclick=\"" + functionCall + "\" >" + playerAbilities.Abilities[ab].name + "</input>";
+            displayName += "(" + playerAbilities[ab].timer + ")";
+            retval += "<br><input type='button' onclick=\"" + functionCall + "\" disabled>" + displayName + "</input>";
+        }
+        else if (battleState === 1)
+        {
+            retval += "<br><input type='button' onclick=\"" + functionCall + "\" >" + displayName + "</input>";
         }
         else
         {
-            retval += "<br><input type='button' onclick=\"" + functionCall + "\" disabled>" + playerAbilities.Abilities[ab].name
-                    + "(" + playerAbilities.Abilities[ab].timer + ")" + "</input>";
+            retval += "<br><input type='button' onclick=\"" + functionCall + "\" disabled>" + displayName + "</input>";
         }
     }
 
@@ -485,12 +490,12 @@ function DisplayItems()
     var retval = "";
     for (var item in playerItems)
     {
-        if(playerItems[item].type.indexOf("equip_") == -1)
-            {
-        var functionCall = "UseItem('" + playerItems[item].name + "');";
+        if (playerItems[item].type.indexOf("equip_") == -1)
+        {
+            var functionCall = "UseItem('" + playerItems[item].name + "');";
 
-        retval += "<br><input type='button' onclick=\"" + functionCall + "\" >" + playerItems[item].name + "</input>";
-            }
+            retval += "<br><input type='button' onclick=\"" + functionCall + "\" >" + playerItems[item].name + "</input>";
+        }
 
     }
 
@@ -509,7 +514,7 @@ function DisplayGameWorld()
     }
 
     htmlStr += "<br><a href='javascript:void(0)' onclick='DisplayStats();'>View Stats</a>";
-     htmlStr += "<br><a href='javascript:void(0)' onclick='DisplayEquipment();'>View Equipment</a>";
+    htmlStr += "<br><a href='javascript:void(0)' onclick='DisplayEquipment();'>View Equipment</a>";
     htmlStr += "<br><a href='javascript:void(0)' onclick='DisplayInventory();'>View Inventory</a>";
     htmlStr += "<br><a href='javascript:void(0)' onclick='DisplayNewStore(" + "store1ItemList" + ");'>Store</a>";
 
@@ -548,27 +553,27 @@ function DisplayInventory()
 function DisplayEquipment()
 {
     var htmlStr = "<h1>Player Equipment</h1>";
-    
+
     htmlStr += "<table>";
     htmlStr += "<tr><td>Name</td><td>Type</td><td>Effect</td><td>Amount</td></tr>";
     for (var item in playerEquipment)
     {
-      htmlStr += "<tr><td>"+ playerEquipment[item].name + "</td><td>"+ playerEquipment[item].type 
-              + "</td><td>"+ playerEquipment[item].effect+ "</td><td>"+ playerEquipment[item].amount+ "</td></tr>";
-       
+        htmlStr += "<tr><td>" + playerEquipment[item].name + "</td><td>" + playerEquipment[item].type
+                + "</td><td>" + playerEquipment[item].effect + "</td><td>" + playerEquipment[item].amount + "</td></tr>";
+
     }
-    
+
     htmlStr += "</table>";
-    
+
     for (var item in playerItems)
     {
-        if(playerItems[item].type.indexOf("equip_") != -1)
-            {
-        var functionCall = "EquipItem('" + item + "'); DisplayEquipment();";
+        if (playerItems[item].type.indexOf("equip_") != -1)
+        {
+            var functionCall = "EquipItem('" + item + "'); DisplayEquipment();";
 
-        htmlStr += "<br><input type='button' onclick=\"" + functionCall + "\" value='Equip'></input>";
-          htmlStr +=  playerItems[item].name ;
-            }
+            htmlStr += "<br><input type='button' onclick=\"" + functionCall + "\" value='Equip'></input>";
+            htmlStr += playerItems[item].name;
+        }
 
     }
 
@@ -576,26 +581,26 @@ function DisplayEquipment()
 
     var battleElement = document.getElementById(battleID);
     battleElement.innerHTML = htmlStr;
-    
+
 }
 
 function EquipItem(itemIndex)
 {
     var item = playerItems[itemIndex];
-    
+
     var type = item.type;
-    for(var i in playerEquipment)
+    for (var i in playerEquipment)
+    {
+        if (playerEquipment[i].type === type)
         {
-            if(playerEquipment[i].type === type)
-                {
-                    playerItems.push(playerEquipment[i]);
-                     playerEquipment.splice(i, 1);
-                   
-                }
+            playerItems.push(playerEquipment[i]);
+            playerEquipment.splice(i, 1);
+
         }
-        
-       playerEquipment.push(item);
-       playerItems.splice(itemIndex,1);
+    }
+
+    playerEquipment.push(item);
+    playerItems.splice(itemIndex, 1);
 }
 
 function DisplayStats()
@@ -613,12 +618,12 @@ function DisplayStats()
     htmlStr += "<h2>Items</h2>";
     for (var item in playerItems.Items)
     {
-        htmlStr += "<br>" + playerItems.Items[item].name;
+        htmlStr += "<br>" + playerItems[item].name;
     }
     htmlStr += "<h2>Abilities</h2>";
-    for (var ab in playerAbilities.Abilities)
+    for (var ab in playerAbilities)
     {
-        htmlStr += "<br>" + playerAbilities.Abilities[ab].name;
+        htmlStr += "<br>" + playerAbilities[ab].name;
     }
 
     htmlStr += "<br><a href='javascript:void(0)' onclick='DisplayGameWorld();'>Back to Game World</a>";
@@ -630,7 +635,7 @@ function DisplayStats()
 function SellItem(index)
 {
     var item = playerItems[index];
-    playerMoney += parseInt(item.cost,10);
+    playerMoney += parseInt(item.cost, 10);
     sellList.push(item);
     playerItems.splice(index, 1);
 }
@@ -640,9 +645,9 @@ function BuyItem(index)
 {
 
     var item = sellList[index];
-    if (playerMoney >= parseInt(item.cost,10))
+    if (playerMoney >= parseInt(item.cost, 10))
     {
-        playerMoney -= parseInt(item.cost,10);
+        playerMoney -= parseInt(item.cost, 10);
         playerItems.push(item);
         sellList.splice(index, 1);
         return true;
@@ -655,13 +660,13 @@ function BuyItem(index)
 
 function DisplayNewStore(storeIDList)
 {
-     sellList = GetItemListFromIDList(storeIDList);
-     DisplayStore();
+    sellList = GetItemListFromIDList(storeIDList);
+    DisplayStore();
 }
 
 function DisplayStore()
 {
-    
+
     var htmlStr = "<h1>Store</h2>";
     htmlStr += "Player Money: " + playerMoney + "<br>";
     htmlStr += "Buy: <br>";
@@ -725,7 +730,7 @@ function AddPlayerItemFromID(id)
 {
     var item = GetItemFromID(id);
     playerItems.Items.push(item);
-    
+
 }
 
 
@@ -734,13 +739,13 @@ function GetItemFromID(id)
     var result = $.grep(masterItemList, function(e) {
         return e.id == id;
     });
-    
+
     if (result.length == 0) {
         return null;
     }
     else
     {
-      return result[0];
+        return result[0];
 
     }
 }
@@ -750,12 +755,12 @@ function GetItemFromID(id)
 function GetItemListFromIDList(idList)
 {
     var itemList = [];
-    for(var id in idList)
-        {
-            var curItem = GetItemFromID(idList[id]);
-            itemList.push(curItem);
-        }
-        return itemList;
+    for (var id in idList)
+    {
+        var curItem = GetItemFromID(idList[id]);
+        itemList.push(curItem);
+    }
+    return itemList;
 }
 
 function AddPlayerItemsFromList(itemList)
@@ -766,9 +771,9 @@ function AddPlayerItemsFromList(itemList)
 function PrintItemList(itemList)
 {
     var retval = "";
-    for(var item in itemList)
-        {
-            retval += "" + itemList[item].name + ", ";
-        }
-        return retval;
+    for (var item in itemList)
+    {
+        retval += "" + itemList[item].name + ", ";
+    }
+    return retval;
 }
