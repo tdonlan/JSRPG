@@ -2,9 +2,8 @@
 var battleState = 0;
 
 var playerJSON = {"name": "Player", "TotalHP": 100, "CurrentHP": 100, "AttackScore": 10, "DefenseScore": 10};
-//var playerItemJSON = {"Items": [{"name": "Healing Potion", "type": "heal", "amount": 100}, {"name": "Healing Potion", "type": "heal", "amount": 100}, {"name": "Grenade", "type": "damage", "amount": 50}]};
 var playerAbilitiesJSON = [{"name": "Super Attack", "type": "damage", "timer": 0, "cooldown": 2, "amount": 25}];
-//var playerWeaponJSON = {"Weapons": [{"name": "Bent Dagger", "damage": 10, "equipped": true}]};
+
 
 var goblinJSON = {"name": "Goblin", "TotalHP": 50, "CurrentHP": 50, "AttackScore": 10, "DefenseScore": 10, "WeaponDmg": 5, "coin": 10, "ItemList": "goblinItemList"};
 var dragonJSON = {"name": "Dragon", "TotalHP": 200, "CurrentHP": 200, "AttackScore": 75, "DefenseScore": 55, "WeaponDmg": 50, "coin": 500, "ItemList": "dragonItemList"};
@@ -172,14 +171,10 @@ function playerDamageEnemy(amount)
 //returns the percent that the attack will hit
 function getAttackRatio(attackerValue, defenderValue)
 {
-    
-    
-    
     var attackRatio = (attackerValue - defenderValue) / (attackerValue + defenderValue);
     attackRatio = (attackRatio + 1) / 2;
     
     return attackRatio * 100;
-
 }
 
 function playerAttack()
