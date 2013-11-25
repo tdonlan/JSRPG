@@ -1,0 +1,98 @@
+JSRPG
+=====
+
+Prototype for javascript based RPG.  Stats, enemies, equipment stored in JSON.  Also includes store to buy/sell items.
+
+Note: this prototype is very rough, and probably does things in a very ugly way.  Part of the reason I stopped working on it was because building an RPG in javascript was so painful.  But it may be an intersting starting point for other projects.
+
+Overview of Design:
+
+Files
+	index.html - acts as a wrapper to load javascript (jquery, JSBattle.js) and call the InitGame() method
+	libs/JSBattle.js - all the logic (and JSON data) of for the RPG game.
+	libs/ItemList.csv - the raw data for items used in the game.
+	libs/js/jquery.csv - used to load the ItemList.csv into javascript object
+	libs/js/jquery - used for basic jquery functionality.
+
+DataTypes
+		The data for the game are stored in JSON objects declared at the top of the JSBattle.js.  These could also be loaded from external files.
+		
+		Player:
+			playerJSON - basic stats of player: name, hp, attack, defense
+			playerAbilities - special abilities the player can use during combat (ex: super attack).
+				An ability has a name, type (damage / heal), timer (current cooldown timer), cooldown (number of turns till reuse), and amount (how much damage / healing / etc)
+		Enemies:
+			goblinJSON, dragonJSON - includes name, total HP, attack, defense, damage, coin, itemList
+			enemyList - master list of all enemies.
+		
+		Items:
+			Items are stored in ItemList.csv.  This file is read in by jquery.csv and stored in the respective item lists by the GetItemListFromIDList function.
+			
+			ex:  playerItems = GetItemListFromIDList(playerItemList); loads the [1,1,3] from the CSV file (2 small healing potions and a rusty dagger)
+			
+Game Initialization
+	1. Before anything, call initGame("battleArea", "battleLog");  Pass in the names of the Divs used for the battle Area and the battle log.
+	2. InitGame will store the Divs to use, as well as load the player, item and enemy data from respective JSON and CSV lists.
+	3. Lastly, it will call DisplayGameWorld(), which will print the options to the player.
+
+Battle Loop
+	1. To start a battle between the player and an enemy, call initBattleWithEnemy(enemy)
+	2. This will call initBattle(enemyJSON), which will load the enemyJSON and enemyItem list, as well as start the battle loop.
+	3. The battleLoop() uses an Interval timer of 1 second for each phase state of the battle.
+	4. Battle Phases:
+		0. "Let the battle begin." Initialized state
+		1. Waiting for player input
+		2. Enemy Attack
+		3. Win Battle: Display the Game Options
+		4. Lose Battle: Display the Game Options
+	5. The attack calculation - done in the getAttackRatio() function.  Ratio = ((((attack - defense) / (attack + defense))) + 1 / 2) * 100.  The player/enemy must then roll *under* the ratio to hit.  Damage is deducted from teh player/enemy HP.
+	6. On victory (WinBattle(), the items from enemyItemList are added to the playerItem list.
+	7. The main Game screen is displayed DisplayGameWorld()
+
+Inventory
+	Items are a javascript object with the following fields:
+		ID - used to load from the CSV into the javascript itemList arrays
+		name - display name
+		description - display description
+		type - "potion","equip_weapon","equip_chest","item", etc
+		effect - "heal","damage","attack","defense"
+		amount - numeric value
+		cost - numeric value for buy/sell price
+		
+	Items are loaded into a javascript array using the function GetItemListFromIDList(idList);
+	
+	Use an Item (in combat) with UseItem(itemName)
+	Equip an Item (in equip screen) with EquipItem(itemName).  Equipping an item will add those item stats to the player's stats.  note, you can only have one item per type equipped at at time.  (aka - one equip_weapon, one equip_chest, etc).
+	
+	Buy an Item (in store) with BuyItem(index).  Note, the index is the item in the sellList, which is a array which must exist on the store screen.
+	Sell and Item with SellItem(index).  The index is in the player's inventory.  You can't sell equipped gear.
+	
+Store
+	Display a store with DisplayNewStore(storeIDList).  The storeIDList is a javascript object that contains the IDs of items to sell from the ItemList.csv. 
+
+Display
+	The raw HTML is created for display in the Display and Print functions:
+	
+	UpdateDisplay() - called in the battleLoop to update the Battle display.
+	printBattle() - prints the current stats, abilities, and usable items of the player and enemy engaged in battle.
+	DisplayAbilities() - helper function to display current player abilities
+	DisplayItems() - helper function to display current player items to use in battle
+	DisplayGameWorld() - displays the "home screen" of the game - options to start a new battle, view equipment, inventory or store
+	DisplayInventory() - current player inventory
+	DisplayEquipment() - current player equipment
+	DisplayStats() - current player stats
+	DisplayNewStore(storeIDList) - display store with given store ID
+	
+Logging
+	Logging is done throughout the battle, by adding to the combatStatus variable.  This variable is then displayed in the battleLog div.
+	
+Conclusion
+	Building an RPG is pure javascript is pretty ugly.  Systems with complex rules (RPG combat, items, abilities, etc) work much better in compiled programming languages with strong typing.  The biggest challenges I think still remain:
+	
+		-Enumerations of types/abilities - currently, adding a new "type" for an item or ability simply means putting a unique string in that JSON column.  Then, in the methods to apply the ability, that string must be explicitly checked.  This is solved using enumerations in other langauges, but enums are ugly in javascript.  Some sort of object consistency checking system might be useful to validate data as it is loaded into the game.
+		
+		-Dynamic data loading - In teh current system, there is a hardcoded "link" between the game data objects (JSON variables declared on the page), and what is loaded for the game.  An improvement would be to add a layer of abstraction, and store these JSON objects in an external resource (flat file) to be loaded on the fly.
+		
+		
+	
+	
